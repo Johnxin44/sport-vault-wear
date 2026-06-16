@@ -1,0 +1,52 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * { box-sizing: border-box; }
+  body {
+    background-color: #080808;
+    color: #F2F0EB;
+    font-family: 'Inter', system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: #111; }
+  ::-webkit-scrollbar-thumb { background: #333; border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover { background: #F5A623; }
+}
+
+@layer components {
+  .btn-primary {
+    @apply bg-brand-amber text-black font-display text-lg tracking-widest px-8 py-3 
+           hover:bg-yellow-400 transition-all duration-200 hover:-translate-y-0.5 
+           active:translate-y-0 disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+  .btn-outline {
+    @apply border border-white/20 text-white font-display text-lg tracking-widest px-8 py-3 
+           hover:border-brand-amber hover:text-brand-amber transition-all duration-200;
+  }
+  .btn-danger {
+    @apply bg-red-600 text-white font-display text-base tracking-widest px-6 py-2.5 
+           hover:bg-red-700 transition-all duration-200;
+  }
+  .input-field {
+    @apply w-full bg-[#1a1a1a] border border-white/10 text-white px-4 py-3 text-sm 
+           focus:outline-none focus:border-brand-amber transition-colors duration-200
+           placeholder:text-gray-600;
+  }
+  .card {
+    @apply bg-[#111] border border-white/5 hover:border-brand-amber/40 
+           transition-all duration-300;
+  }
+  .section-title {
+    @apply font-display text-4xl md:text-5xl tracking-widest text-white;
+  }
+  .label {
+    @apply text-xs font-semibold tracking-widest uppercase text-gray-500 mb-1.5 block;
+  }
+  .badge-new    { @apply bg-brand-amber text-black text-xs font-bold tracking-widest px-2.5 py-1; }
+  .badge-sale   { @apply bg-red-600 text-white text-xs font-bold tracking-widest px-2.5 py-1; }
+  .badge-hot    { @apply bg-orange-500 text-white text-xs font-bold tracking-widest px-2.5 py-1; }
+  .page-wrapper { @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8; }
+}
