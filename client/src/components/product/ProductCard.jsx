@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom'
 import { useDispatch } from 'react-redux'
 import { HiShoppingBag, HiStar } from 'react-icons/hi'
 import { addToCart } from '../../store/slices/cartSlice'
+import { getImageUrl } from '../../utils/getImageUrl'
 
 export default function ProductCard({ product }) {
   const dispatch = useDispatch()
@@ -20,7 +21,7 @@ export default function ProductCard({ product }) {
     <Link to={`/products/${product._id}`} className="group card block animate-fade-in">
       <div className="relative overflow-hidden aspect-[3/4] bg-[#1a1a1a]">
         <img
-          src={product.images?.[0] ? `/uploads/${product.images[0]}` : 'https://placehold.co/400x500/111/F5A623?text=ITEM'}
+          src={product.images?.[0] ? getImageUrl(product.images[0]) : 'https://placehold.co/400x500/111/F5A623?text=ITEM'}
           alt={product.name}
           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
           onError={(e) => { e.target.src = 'https://placehold.co/400x500/111/F5A623?text=ITEM' }}

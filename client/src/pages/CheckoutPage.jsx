@@ -5,6 +5,7 @@ import { initiatePayment, clearOrderState } from '../store/slices/orderSlice'
 import { selectCartItems, selectCartTotal } from '../store/slices/cartSlice'
 import { HiLockClosed } from 'react-icons/hi'
 import countries, { getCountryByName } from '../utils/countries'
+import { getImageUrl } from '../utils/getImageUrl'
 
 export default function CheckoutPage() {
   const dispatch  = useDispatch()
@@ -128,7 +129,7 @@ export default function CheckoutPage() {
             {items.map(i => (
               <div key={i.key} className="flex items-center gap-3">
                 <div className="w-12 h-14 bg-[#1a1a1a] flex-shrink-0 overflow-hidden">
-                  <img src={i.image ? `/uploads/${i.image}` : 'https://placehold.co/50x60/111/F5A623?text=I'} alt={i.name} className="w-full h-full object-cover" />
+                  <img src={i.image ? getImageUrl(i.image) : 'https://placehold.co/50x60/111/F5A623?text=I'} alt={i.name} className="w-full h-full object-cover" />
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-xs font-semibold text-white truncate">{i.name}</p>

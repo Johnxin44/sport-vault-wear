@@ -5,6 +5,7 @@ import { fetchMyOrders } from '../store/slices/orderSlice'
 import Spinner from '../components/common/Spinner'
 import EmptyState from '../components/common/EmptyState'
 import { HiClipboardList } from 'react-icons/hi'
+import { getImageUrl } from '../utils/getImageUrl'
 
 const statusColors = {
   pending:   'bg-white/5 text-gray-400',
@@ -57,7 +58,7 @@ export default function OrdersPage() {
               {order.items.map((item, i) => (
                 <div key={i} className="flex items-center gap-2 flex-shrink-0">
                   <div className="w-12 h-14 bg-[#1a1a1a] overflow-hidden">
-                    <img src={item.image ? `/uploads/${item.image}` : 'https://placehold.co/50x60/111/F5A623?text=I'} alt={item.name} className="w-full h-full object-cover" />
+                    <img src={item.image ? getImageUrl(item.image) : 'https://placehold.co/50x60/111/F5A623?text=I'} alt={item.name} className="w-full h-full object-cover" />
                   </div>
                   <div>
                     <p className="text-xs text-white">{item.name}</p>

@@ -5,6 +5,7 @@ import { fetchProductById, clearCurrent, submitReview } from '../store/slices/pr
 import { addToCart } from '../store/slices/cartSlice'
 import Spinner from '../components/common/Spinner'
 import { HiStar, HiShoppingBag, HiChevronRight } from 'react-icons/hi'
+import { getImageUrl } from '../utils/getImageUrl'
 
 export default function ProductDetailPage() {
   const { id } = useParams()
@@ -39,7 +40,7 @@ export default function ProductDetailPage() {
   }
 
   const images = product.images?.length
-    ? product.images.map(img => `/uploads/${img}`)
+    ? product.images.map(img => getImageUrl(img))
     : ['https://placehold.co/600x700/111/F5A623?text=ITEM']
 
   return (

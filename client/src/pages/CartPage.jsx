@@ -3,6 +3,7 @@ import { useSelector, useDispatch } from 'react-redux'
 import { updateQuantity, removeFromCart, selectCartItems, selectCartTotal } from '../store/slices/cartSlice'
 import EmptyState from '../components/common/EmptyState'
 import { HiShoppingBag, HiTrash, HiArrowRight } from 'react-icons/hi'
+import { getImageUrl } from '../utils/getImageUrl'
 
 export default function CartPage() {
   const dispatch = useDispatch()
@@ -28,7 +29,7 @@ export default function CartPage() {
           {items.map(item => (
             <div key={item.key} className="flex gap-4 bg-[#111] border border-white/5 p-4">
               <Link to={`/products/${item.productId}`} className="w-24 h-28 flex-shrink-0 bg-[#1a1a1a] overflow-hidden">
-                <img src={item.image ? `/uploads/${item.image}` : 'https://placehold.co/100x120/111/F5A623?text=I'}
+                <img src={item.image ? getImageUrl(item.image) : 'https://placehold.co/100x120/111/F5A623?text=I'}
                   alt={item.name} className="w-full h-full object-cover" />
               </Link>
               <div className="flex-1">
