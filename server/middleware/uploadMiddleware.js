@@ -1,28 +1,25 @@
 const multer = require('multer')
 const path   = require('path')
-const fs = require('fs')
+const { CloudinaryStorage } = require('multer-storage-cloudinary')
+const cloudinary = require('../config/cloudinary')
 
-const uploadsDir = path.join(__dirname, '../uploads')
-if (!fs.existsSync(uploadsDir)) {
-  fs.mkdirSync(uploadsDir, { recursive: true })
-}
-
-// Stores uploaded images in /uploads with a unique filename
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, path.join(__dirname, '../uploads'))
-  },
-  filename: (req, file, cb) => {
-    const ext = path.extname(file.originalname)
-    const uniqueName = `${file.fieldname}-${Date.now()}${ext}`
-    cb(null, uniqueName)
+// Stores uploaded product images directly on Cloudinary instead of local disk.
+// This is essential on platforms like Render's free tier, where the local
+// filesystem is wiped on every restart/redeploy — Cloudinary keeps images
+// permanently, accessible via a stable URL, regardless of server restarts.
+const storage = new CloudinaryStorage({
+  cloudinary,
+  params: {
+    folder: 'sport-vault-wear',
+    allowed_formats: ['jpg', 'jpeg', 'png', 'webp'],
+    // Unique public_id so repeated uploads never overwrite each other
+    public_id: (req, file) => `${file.fieldname}-${Date.now()}`,
   },
 })
 
 // Only allow image files
 const fileFilter = (req, file, cb) => {
-  const allowedTypes = /jpeg|jpg|png|webp|jfif/
-
+  const allowedTypes = /jpeg|jpg|png|webp/
   const isValidExt  = allowedTypes.test(path.extname(file.originalname).toLowerCase())
   const isValidMime = allowedTypes.test(file.mimetype)
 

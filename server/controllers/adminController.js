@@ -90,7 +90,7 @@ const createProduct = asyncHandler(async (req, res) => {
     description, sizes, badge, countInStock, featured,
   } = req.body
 
-  const images = req.file ? [req.file.filename] : []
+  const images = req.file ? [req.file.path] : []
 
   const product = await Product.create({
     name,
@@ -144,7 +144,7 @@ const updateProduct = asyncHandler(async (req, res) => {
 
   // Replace image only if a new one was uploaded
   if (req.file) {
-    product.images = [req.file.filename]
+    product.images = [req.file.path]
   }
 
   const updated = await product.save()
