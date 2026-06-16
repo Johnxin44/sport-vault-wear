@@ -4,6 +4,7 @@ import { fetchAdminProducts, createProduct, updateProduct, deleteProduct } from 
 import AdminLayout from '../../components/admin/AdminLayout'
 import Spinner from '../../components/common/Spinner'
 import { HiPlus, HiPencil, HiTrash, HiX } from 'react-icons/hi'
+import { getImageUrl } from '../../utils/getImageUrl'
 
 const emptyForm = {
   name: '', category: 'jersey', team: '', league: 'Premier League', price: '', originalPrice: '',
@@ -97,7 +98,8 @@ export default function AdminProducts() {
               {products.map(p => (
                 <tr key={p._id} className="border-t border-white/5 hover:bg-white/[0.02]">
                   <td className="px-4 py-3">
-                    <img src={p.images?.[0] ? `/uploads/${p.images[0]}` : 'https://placehold.co/48x48/111/F5A623?text=I'} alt="" className="w-10 h-12 object-cover" />
+                    <img src={p.images?.[0] ? getImageUrl(p.images[0]) : 'https://placehold.co/48x48/111/F5A623?text=I'} alt="" 
+className="w-10 h-12 object-cover" />
                   </td>
                   <td className="px-4 py-3 text-white font-medium">{p.name}</td>
                   <td className="px-4 py-3 text-gray-400 capitalize">{p.category || 'jersey'}</td>

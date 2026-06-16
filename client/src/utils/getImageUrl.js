@@ -5,5 +5,9 @@ const API_BASE = import.meta.env.VITE_API_URL || ''
 
 export const getImageUrl = (filename) => {
   if (!filename) return null
+  // New uploads are full Cloudinary URLs (start with http) — use as-is.
+  if (filename.startsWith('http')) return filename
+  // Older/legacy images uploaded before the Cloudinary switch were stored as
+  // plain filenames served from the backend's local /uploads folder.
   return `${API_BASE}/uploads/${filename}`
 }
