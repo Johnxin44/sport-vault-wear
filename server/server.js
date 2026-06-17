@@ -16,6 +16,9 @@ const productRoutes = require('./routes/productRoutes')
 const orderRoutes   = require('./routes/orderRoutes')
 const adminRoutes   = require('./routes/adminRoutes')
 const paymentRoutes = require('./routes/paymentRoutes')
+const cryptoRoutes  = require('./routes/cryptoRoutes')
+const productRequestRoutes = require('./routes/productRequestRoutes')
+const contactRoutes = require('./routes/contactRoutes')
 
 // Connect to MongoDB
 connectDB()
@@ -55,6 +58,9 @@ app.use('/api/products', productRoutes)
 app.use('/api/orders', orderRoutes)
 app.use('/api/admin', adminRoutes)
 app.use('/api/payments', paymentRoutes)
+app.use('/api/crypto', cryptoRoutes)
+app.use('/api/product-requests', productRequestRoutes)
+app.use('/api/contact', contactRoutes)
 
 // Health check
 app.get('/api/health', (req, res) => {

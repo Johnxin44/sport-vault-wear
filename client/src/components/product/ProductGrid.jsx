@@ -9,9 +9,14 @@ export default function ProductGrid({ products, loading }) {
   if (!products?.length) return (
     <EmptyState
       icon={<HiShoppingBag />}
-      title="NO JERSEYS FOUND"
-      message="Try adjusting your filters or search term."
-      action={<Link to="/products" className="btn-outline text-sm">View All</Link>}
+      title="NO PRODUCTS FOUND"
+      message="Try adjusting your filters or search term — or let us know what you're looking for."
+      action={
+        <div className="flex gap-3 flex-wrap justify-center">
+          <Link to="/products" className="btn-outline text-sm">View All</Link>
+          <Link to="/request-product" className="btn-primary text-sm">Request This Item</Link>
+        </div>
+      }
     />
   )
   return (

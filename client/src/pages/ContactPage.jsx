@@ -1,19 +1,25 @@
 import { useState } from 'react'
+import { Link } from 'react-router-dom'
 import toast from 'react-hot-toast'
-import { HiMail, HiPhone, HiLocationMarker } from 'react-icons/hi'
+import api from '../utils/api'
+import { HiMail, HiPhone, HiLocationMarker, HiSearch } from 'react-icons/hi'
 
 export default function ContactPage() {
   const [form, setForm] = useState({ name: '', email: '', subject: '', message: '' })
   const [submitting, setSubmitting] = useState(false)
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
     setSubmitting(true)
-    setTimeout(() => {
-      toast.success("Message sent! We'll get back to you within 24 hours.")
+    try {
+      const { data } = await api.post('/contact', form)
+      toast.success(data.message || "Message sent! We'll get back to you within 24 hours.")
       setForm({ name: '', email: '', subject: '', message: '' })
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Could not send your message. Please try again.')
+    } finally {
       setSubmitting(false)
-    }, 800)
+    }
   }
 
   return (
@@ -36,6 +42,14 @@ export default function ContactPage() {
               </div>
             </div>
           ))}
+
+          <Link to="/request-product" className="flex items-start gap-4 bg-brand-amber/10 border border-brand-amber/30 p-5 hover:bg-brand-amber/15 transition-colors">
+            <HiSearch size={22} className="text-brand-amber flex-shrink-0 mt-0.5" />
+            <div>
+              <p className="text-xs tracking-widest uppercase text-brand-amber mb-1">Looking for something specific?</p>
+              <p className="text-white text-sm">Request a product not yet listed →</p>
+            </div>
+          </Link>
         </div>
 
         <form onSubmit={handleSubmit} className="lg:col-span-2 bg-[#111] border border-white/5 p-6 space-y-4">

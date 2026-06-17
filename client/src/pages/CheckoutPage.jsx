@@ -1,18 +1,19 @@
 import { useState, useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
-import { initiatePayment, clearOrderState } from '../store/slices/orderSlice'
-import { selectCartItems, selectCartTotal } from '../store/slices/cartSlice'
-import { HiLockClosed } from 'react-icons/hi'
+import { initiateCryptoPayment, submitCryptoTransaction, clearOrderState } from '../store/slices/orderSlice'
+import { clearCart, selectCartItems, selectCartTotal } from '../store/slices/cartSlice'
+import { HiLockClosed, HiClipboardCopy, HiCheckCircle } from 'react-icons/hi'
 import countries, { getCountryByName } from '../utils/countries'
 import { getImageUrl } from '../utils/getImageUrl'
+import toast from 'react-hot-toast'
 
 export default function CheckoutPage() {
   const dispatch  = useDispatch()
   const navigate  = useNavigate()
   const items     = useSelector(selectCartItems)
   const subtotal  = useSelector(selectCartTotal)
-  const { loading, paymentLink, error } = useSelector((s) => s.order)
+  const { loading, cryptoPayment, cryptoSubmitted, error } = useSelector((s) => s.order)
   const { user }  = useSelector((s) => s.auth)
   const shipping  = subtotal >= 150 ? 0 : 9.99
 
@@ -23,17 +24,18 @@ export default function CheckoutPage() {
     address:   '', city: '', zip: '', country: '',
   })
   const [zipError, setZipError] = useState('')
+  const [txHash, setTxHash] = useState('')
+  const [copied, setCopied] = useState(false)
 
   useEffect(() => { dispatch(clearOrderState()) }, [dispatch])
 
-  // Once we have a Flutterwave payment link, redirect the browser there
   useEffect(() => {
-    if (paymentLink) {
-      window.location.href = paymentLink
+    if (cryptoSubmitted) {
+      dispatch(clearCart())
     }
-  }, [paymentLink])
+  }, [cryptoSubmitted, dispatch])
 
-  if (items.length === 0) {
+  if (items.length === 0 && !cryptoPayment && !cryptoSubmitted) {
     navigate('/cart'); return null
   }
 
@@ -55,7 +57,7 @@ export default function CheckoutPage() {
   const handleSubmit = (e) => {
     e.preventDefault()
     if (!validateZip()) return
-    dispatch(initiatePayment({
+    dispatch(initiateCryptoPayment({
       items: items.map(i => ({ product: i.productId, name: i.name, image: i.image, price: i.price, size: i.size, quantity: i.quantity })),
       shippingAddress: { address: form.address, city: form.city, zip: form.zip, country: form.country },
       customer: { firstName: form.firstName, lastName: form.lastName, email: form.email },
@@ -63,6 +65,89 @@ export default function CheckoutPage() {
     }))
   }
 
+  const handleCopyAddress = () => {
+    navigator.clipboard.writeText(cryptoPayment.walletAddress)
+    setCopied(true)
+    toast.success('Wallet address copied')
+    setTimeout(() => setCopied(false), 2000)
+  }
+
+  const handleSubmitTxHash = (e) => {
+    e.preventDefault()
+    if (!txHash.trim()) {
+      toast.error('Please enter your transaction hash')
+      return
+    }
+    dispatch(submitCryptoTransaction({ orderId: cryptoPayment.orderId, txHash }))
+  }
+
+  // ─── Step 3: Transaction submitted, awaiting manual verification ───
+  if (cryptoSubmitted) {
+    return (
+      <div className="page-wrapper py-24 text-center animate-fade-in max-w-lg mx-auto">
+        <HiCheckCircle size={64} className="text-brand-amber mx-auto mb-6" />
+        <h1 className="font-display text-4xl tracking-widest text-white mb-3">TRANSACTION SUBMITTED</h1>
+        <p className="text-gray-400 mb-2">
+          We've received your transaction details and will verify your payment shortly.
+        </p>
+        <p className="text-gray-500 text-sm mb-8">
+          You'll receive a confirmation email once your order is verified — this usually takes a few hours.
+        </p>
+        <button onClick={() => navigate('/orders')} className="btn-primary">View My Orders</button>
+      </div>
+    )
+  }
+
+  // ─── Step 2: Show wallet address + QR code, wait for tx hash ───
+  if (cryptoPayment) {
+    return (
+      <div className="page-wrapper py-12 animate-fade-in max-w-lg mx-auto">
+        <h1 className="font-display text-4xl tracking-widest text-white mb-2 text-center">PAY WITH USDT</h1>
+        <p className="text-gray-500 text-sm text-center mb-10">Network: {cryptoPayment.network}</p>
+
+        <div className="bg-[#111] border border-white/5 p-6 mb-6 text-center">
+          <p className="text-xs text-gray-500 uppercase tracking-widest mb-1">Amount Due</p>
+          <p className="font-display text-4xl text-brand-amber mb-6">${cryptoPayment.amountDue.toFixed(2)} USDT</p>
+
+          <img src={cryptoPayment.qrCode} alt="Wallet QR code" className="w-48 h-48 mx-auto mb-6 bg-white p-2" />
+
+          <p className="text-xs text-gray-500 uppercase tracking-widest mb-2">Send to this address</p>
+          <div className="flex items-center gap-2 bg-[#1a1a1a] border border-white/10 p-3">
+            <code className="text-xs text-white break-all flex-1 text-left">{cryptoPayment.walletAddress}</code>
+            <button onClick={handleCopyAddress} className="text-brand-amber hover:opacity-70 flex-shrink-0">
+              {copied ? <HiCheckCircle size={20} /> : <HiClipboardCopy size={20} />}
+            </button>
+          </div>
+        </div>
+
+        <div className="bg-white/5 border border-white/10 p-4 text-sm text-gray-400 mb-6 flex items-start gap-3">
+          <HiLockClosed size={18} className="text-brand-amber flex-shrink-0 mt-0.5" />
+          <p>
+            Send <strong className="text-white">exactly ${cryptoPayment.amountDue.toFixed(2)} USDT</strong> using
+            the <strong className="text-white">TRC20 (Tron)</strong> network only. Sending via a different
+            network may result in lost funds.
+          </p>
+        </div>
+
+        <form onSubmit={handleSubmitTxHash} className="bg-[#111] border border-white/5 p-6">
+          <p className="label">Transaction Hash / ID</p>
+          <p className="text-xs text-gray-500 mb-3">After sending, paste your transaction hash here so we can verify your payment.</p>
+          <input
+            value={txHash}
+            onChange={(e) => setTxHash(e.target.value)}
+            placeholder="e.g. 9f3a7b2c1d4e5f6a7b8c9d0e1f2a3b4c..."
+            className="input-field mb-4"
+            required
+          />
+          <button type="submit" disabled={loading} className="btn-primary w-full py-3.5">
+            {loading ? 'Submitting...' : "I've Sent the Payment"}
+          </button>
+        </form>
+      </div>
+    )
+  }
+
+  // ─── Step 1: Shipping form ───
   return (
     <div className="page-wrapper py-12 animate-fade-in">
       <h1 className="font-display text-5xl tracking-widest text-white mb-10">CHECKOUT</h1>
@@ -105,20 +190,19 @@ export default function CheckoutPage() {
 
           {/* Payment */}
           <div className="bg-[#111] border border-white/5 p-6">
-            <h2 className="font-display text-2xl tracking-widest text-white mb-4">PAYMENT</h2>
-            <div className="flex items-start gap-3 bg-white/5 border border-white/10 p-4 text-sm text-gray-400">
+            <h2 className="font-display text-2xl tracking-widest text-white mb-4">PAYMENT METHOD</h2>
+            <div className="flex items-start gap-3 bg-white/5 border border-brand-amber/30 p-4 text-sm text-gray-400">
               <HiLockClosed size={20} className="text-brand-amber flex-shrink-0 mt-0.5" />
               <p>
-                You'll be securely redirected to <strong className="text-white">Flutterwave</strong> to complete
-                your payment by card, bank transfer, or other supported methods. Your card details are never
-                seen or stored by Sport Vault Wear.
+                Pay with <strong className="text-white">USDT (TRC20)</strong>. After this step, you'll receive
+                a wallet address and QR code to send your payment to.
               </p>
             </div>
             {error && <p className="text-red-400 text-sm mt-4">{error}</p>}
           </div>
 
           <button type="submit" disabled={loading} className="btn-primary w-full py-4 text-xl">
-            {loading ? 'Redirecting to secure checkout...' : `Pay $${(subtotal + shipping).toFixed(2)}`}
+            {loading ? 'Preparing payment...' : `Continue to Pay $${(subtotal + shipping).toFixed(2)}`}
           </button>
         </form>
 

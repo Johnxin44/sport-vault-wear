@@ -20,12 +20,14 @@ import ProfilePage    from './pages/ProfilePage'
 import OrdersPage     from './pages/OrdersPage'
 import AboutPage      from './pages/AboutPage'
 import ContactPage    from './pages/ContactPage'
+import RequestProductPage from './pages/RequestProductPage'
 import NotFoundPage   from './pages/NotFoundPage'
 
 // Pages — Admin
 import AdminDashboard  from './pages/admin/AdminDashboard'
 import AdminProducts   from './pages/admin/AdminProducts'
 import AdminOrders     from './pages/admin/AdminOrders'
+import AdminRequests   from './pages/admin/AdminRequests'
 import AdminUsers      from './pages/admin/AdminUsers'
 import AdminAnalytics  from './pages/admin/AdminAnalytics'
 
@@ -67,6 +69,7 @@ export default function App() {
             <Route path="/payment/callback" element={<PaymentCallbackPage />} />
             <Route path="/profile"  element={<ProfilePage />} />
             <Route path="/orders"   element={<OrdersPage />} />
+            <Route path="/request-product" element={<RequestProductPage />} />
           </Route>
 
           {/* Admin routes */}
@@ -74,6 +77,7 @@ export default function App() {
             <Route path="/admin"            element={<AdminDashboard />} />
             <Route path="/admin/products"   element={<AdminProducts />} />
             <Route path="/admin/orders"     element={<AdminOrders />} />
+            <Route path="/admin/requests"   element={<AdminRequests />} />
             <Route path="/admin/users"      element={<AdminUsers />} />
             <Route path="/admin/analytics"  element={<AdminAnalytics />} />
           </Route>

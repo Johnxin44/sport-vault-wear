@@ -7,10 +7,13 @@ const {
   updateProduct,
   deleteProduct,
   getAdminOrders,
+  getAwaitingVerificationOrders,
+  verifyCryptoOrder,
   updateOrderStatus,
   getUsers,
   deleteUser,
 } = require('../controllers/adminController')
+const { getProductRequests, updateProductRequest } = require('../controllers/productRequestController')
 const { protect, admin } = require('../middleware/authMiddleware')
 const upload = require('../middleware/uploadMiddleware')
 
@@ -28,10 +31,16 @@ router.delete('/products/:id', deleteProduct)
 
 // Orders
 router.get('/orders', getAdminOrders)
+router.get('/orders/awaiting-verification', getAwaitingVerificationOrders)
+router.put('/orders/:id/verify-crypto', verifyCryptoOrder)
 router.put('/orders/:id', updateOrderStatus)
 
 // Users
 router.get('/users', getUsers)
 router.delete('/users/:id', deleteUser)
+
+// Product Requests
+router.get('/product-requests', getProductRequests)
+router.put('/product-requests/:id', updateProductRequest)
 
 module.exports = router

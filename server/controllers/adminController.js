@@ -3,7 +3,7 @@ const Product      = require('../models/Product')
 const Order        = require('../models/Order')
 const User         = require('../models/User')
 const sendEmail    = require('../utils/sendEmail')
-const { orderShippedTemplate } = require('../utils/emailTemplates')
+const { orderShippedTemplate, orderConfirmationTemplate } = require('../utils/emailTemplates')
 
 // ═══════════════════════════════════════════════
 //  DASHBOARD STATS
@@ -178,6 +178,65 @@ const getAdminOrders = asyncHandler(async (req, res) => {
   res.json(orders)
 })
 
+// @desc    Get orders awaiting crypto payment verification
+// @route   GET /api/admin/orders/awaiting-verification
+// @access  Private/Admin
+const getAwaitingVerificationOrders = asyncHandler(async (req, res) => {
+  const orders = await Order.find({ status: 'awaiting_verification', paymentMethod: 'crypto' }).sort({ createdAt: -1 })
+  res.json(orders)
+})
+
+// @desc    Manually confirm or reject a crypto payment after checking the blockchain
+// @route   PUT /api/admin/orders/:id/verify-crypto
+// @access  Private/Admin
+const verifyCryptoOrder = asyncHandler(async (req, res) => {
+  const { approve } = req.body // true = confirm payment, false = reject
+  const order = await Order.findById(req.params.id)
+
+  if (!order) {
+    res.status(404)
+    throw new Error('Order not found')
+  }
+
+  if (order.paymentMethod !== 'crypto') {
+    res.status(400)
+    throw new Error('This order is not a crypto payment')
+  }
+
+  if (order.isPaid) {
+    res.status(400)
+    throw new Error('This order has already been verified')
+  }
+
+  if (!approve) {
+    order.status = 'rejected'
+    await order.save()
+    return res.json(order)
+  }
+
+  // Approved — decrement stock now that payment is confirmed
+  for (const item of order.items) {
+    const product = await Product.findById(item.product)
+    if (product) {
+      product.countInStock = Math.max(0, product.countInStock - item.quantity)
+      await product.save()
+    }
+  }
+
+  order.isPaid = true
+  order.paidAt = new Date()
+  order.status = 'confirmed'
+  await order.save()
+
+  sendEmail({
+    to: order.customer.email,
+    subject: `Order Confirmed — ${order._id} | Sport Vault Wear`,
+    html: orderConfirmationTemplate(order),
+  })
+
+  res.json(order)
+})
+
 // @desc    Update order status
 // @route   PUT /api/admin/orders/:id
 // @access  Private/Admin
@@ -244,6 +303,8 @@ module.exports = {
   updateProduct,
   deleteProduct,
   getAdminOrders,
+  getAwaitingVerificationOrders,
+  verifyCryptoOrder,
   updateOrderStatus,
   getUsers,
   deleteUser,

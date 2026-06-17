@@ -33,7 +33,7 @@ const orderSchema = new mongoose.Schema(
     total:    { type: Number, required: true },
     status: {
       type: String,
-      enum: ['pending', 'confirmed', 'shipped', 'delivered'],
+      enum: ['pending', 'awaiting_verification', 'confirmed', 'shipped', 'delivered', 'rejected'],
       default: 'pending',
     },
     isPaid: {
@@ -46,7 +46,7 @@ const orderSchema = new mongoose.Schema(
     },
     paymentMethod: {
       type: String,
-      enum: ['flutterwave', ''],
+      enum: ['flutterwave', 'crypto', ''],
       default: '',
     },
     txRef: {
@@ -56,6 +56,20 @@ const orderSchema = new mongoose.Schema(
     },
     flwTransactionId: {
       type: String,
+      default: null,
+    },
+    // Crypto-specific payment details
+    cryptoCurrency: {
+      type: String,
+      enum: ['USDT_TRC20', null],
+      default: null,
+    },
+    cryptoTxHash: {
+      type: String,
+      default: null,
+    },
+    cryptoAmount: {
+      type: Number,
       default: null,
     },
   },

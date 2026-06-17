@@ -1,12 +1,13 @@
 import { Link, useLocation } from 'react-router-dom'
 import { useSelector, useDispatch } from 'react-redux'
 import { logout } from '../../store/slices/authSlice'
-import { HiViewGrid, HiShoppingBag, HiClipboardList, HiUsers, HiChartBar, HiExternalLink, HiLogout } from 'react-icons/hi'
+import { HiViewGrid, HiShoppingBag, HiClipboardList, HiUsers, HiChartBar, HiExternalLink, HiLogout, HiSearch } from 'react-icons/hi'
 
 const links = [
   { to: '/admin',           label: 'Overview',  Icon: HiViewGrid },
   { to: '/admin/products',  label: 'Products',  Icon: HiShoppingBag },
   { to: '/admin/orders',    label: 'Orders',    Icon: HiClipboardList },
+  { to: '/admin/requests',  label: 'Requests',  Icon: HiSearch },
   { to: '/admin/users',     label: 'Users',     Icon: HiUsers },
   { to: '/admin/analytics', label: 'Analytics', Icon: HiChartBar },
 ]
