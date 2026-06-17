@@ -25,6 +25,11 @@ connectDB()
 
 const app = express()
 
+// Render (and most hosting platforms) sit behind a reverse proxy, which sets
+// the X-Forwarded-For header. Trusting the first proxy lets express-rate-limit
+// and req.ip correctly identify the real client IP instead of the proxy's IP.
+app.set('trust proxy', 1)
+
 // ─── Security & Logging Middleware ────────────
 
 app.use(helmet({ crossOriginResourcePolicy: false })) // allow images to be served cross-origin
