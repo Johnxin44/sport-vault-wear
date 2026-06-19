@@ -1,5 +1,6 @@
 const mongoose = require('mongoose')
 const bcrypt   = require('bcryptjs')
+const crypto   = require('crypto')
 
 const userSchema = new mongoose.Schema(
   {
@@ -27,11 +28,22 @@ const userSchema = new mongoose.Schema(
       enum: ['customer', 'admin'],
       default: 'customer',
     },
+    isVerified: {
+      type: Boolean,
+      default: false,
+    },
+    verificationToken: {
+      type: String,
+      select: false,
+    },
+    verificationTokenExpire: {
+      type: Date,
+      select: false,
+    },
   },
   { timestamps: true }
 )
 
-// Hash the password before saving — only runs if password was modified
 userSchema.pre('save', async function (next) {
   if (!this.isModified('password')) return next()
   const salt = await bcrypt.genSalt(10)
@@ -39,9 +51,16 @@ userSchema.pre('save', async function (next) {
   next()
 })
 
-// Compare a plain text password against the hashed one in the DB
 userSchema.methods.matchPassword = async function (enteredPassword) {
   return bcrypt.compare(enteredPassword, this.password)
+}
+
+// Generate a verification token and save it to the user
+userSchema.methods.generateVerificationToken = function () {
+  const token = crypto.randomBytes(32).toString('hex')
+  this.verificationToken = crypto.createHash('sha256').update(token).digest('hex')
+  this.verificationTokenExpire = Date.now() + 24 * 60 * 60 * 1000 // 24 hours
+  return token // return the raw token (this goes in the email link)
 }
 
 module.exports = mongoose.model('User', userSchema)
