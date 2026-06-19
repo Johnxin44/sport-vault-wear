@@ -22,7 +22,7 @@ import AboutPage      from './pages/AboutPage'
 import ContactPage    from './pages/ContactPage'
 import RequestProductPage from './pages/RequestProductPage'
 import NotFoundPage   from './pages/NotFoundPage'
-
+import VerifyEmailPage from './pages/VerifyEmailPage'
 // Pages — Admin
 import AdminDashboard  from './pages/admin/AdminDashboard'
 import AdminProducts   from './pages/admin/AdminProducts'
@@ -62,6 +62,7 @@ export default function App() {
           <Route path="/register"  element={<RegisterPage />} />
           <Route path="/about"     element={<AboutPage />} />
           <Route path="/contact"   element={<ContactPage />} />
+          <Route path="/verify-email" element={<VerifyEmailPage />} />
 
           {/* Protected customer routes */}
           <Route element={<PrivateRoute />}>
