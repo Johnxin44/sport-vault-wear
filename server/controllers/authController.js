@@ -22,15 +22,17 @@ const registerUser = asyncHandler(async (req, res) => {
   }
 
   const user = await User.create({ name, email, password })
-
+   console.log('User created:', user.email) 
   // Generate verification token and save to user
   const rawToken = user.generateVerificationToken()
+  console.log('Token generated:', rawToken)
   await user.save()
 
   // Build the verification link
   const verifyUrl = `${process.env.CLIENT_URL}/verify-email?token=${rawToken}`
 
   // Send verification email via Resend
+  console.log('Sending email to:', user.email)
   await sendEmail({
     to: user.email,
     subject: '✅ Verify your Sport Vault Wear account',
@@ -46,6 +48,7 @@ const registerUser = asyncHandler(async (req, res) => {
       </div>
     `,
   })
+  console.log('Email sent!')
 
   res.status(201).json({
     message: 'Account created! Please check your email to verify your account before logging in.',
