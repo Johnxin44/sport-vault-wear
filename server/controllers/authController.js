@@ -21,7 +21,7 @@ const registerUser = asyncHandler(async (req, res) => {
     throw new Error('An account with this email already exists')
   }
 
-  const user = await User.create({ name, email, password })
+const user = await User.create({ name, email, password, isVerified: true }) 
    console.log('User created:', user.email) 
   // Generate verification token and save to user
   const rawToken = user.generateVerificationToken()
@@ -107,10 +107,7 @@ const loginUser = asyncHandler(async (req, res) => {
   }
 
   // Block unverified users from logging in
-  if (!user.isVerified) {
-    res.status(403)
-    throw new Error('Please verify your email address before logging in. Check your inbox.')
-  }
+ 
 
   res.json({
     user: {
