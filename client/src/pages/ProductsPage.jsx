@@ -182,7 +182,7 @@ export default function ProductsPage() {
           <div className="flex items-center justify-between mb-6">
             <div>
               <h1 className="font-display text-3xl tracking-widest text-white">{pageTitle}</h1>
-              <p className="text-sm text-gray-500 mt-1">{total} results</p>
+              {/* <p className="text-sm text-gray-500 mt-1">{total} results</p> */}
             </div>
             <div className="flex items-center gap-3">
               <button onClick={() => setShowFilters(!showFilters)}
